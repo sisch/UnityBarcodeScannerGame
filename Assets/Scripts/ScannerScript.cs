@@ -12,15 +12,23 @@ public class ScannerScript : MonoBehaviour
     private LineRenderer laser;
     private float timePassed;
     private bool canScan;
+    private Valve.VR.InteractionSystem.Hand scannerHand;
 
     void Start ()
 	{
 	    // Leg die LineRenderer Komponente unter laser ab und setze die zweite Koordinate vom LineRenderer auf die 
         // einstellbare Distanz, konkreter auf (0,0,Distanz). Die erste Koordinate (Index 0) ist bei (0,0,0)
-	    laser = GetComponent<LineRenderer>();
-        laser.SetPosition(1,scanner.forward * lineRendererDistance);
+	    
 
-	    canScan = true;
+        GameObject handRight = GameObject.Find("Hand1");
+	    if (handRight != null)
+	    {
+	        scannerHand = handRight.GetComponent<Valve.VR.InteractionSystem.Hand>();
+	        scanner = scannerHand.transform;
+	    }
+	    laser = scanner.GetComponent<LineRenderer>();
+	    laser.SetPosition(1, scanner.forward * lineRendererDistance);
+        canScan = true;
 	    scannerDisplay.text = "-";
 	}
     
@@ -37,7 +45,16 @@ public class ScannerScript : MonoBehaviour
         if (canScan && Input.GetButtonDown("Fire1"))
 	    {
 	        scan();
+	        return;
 	    }
+
+        // Für VR
+        if (canScan && scannerHand != null && scannerHand.GetStandardInteractionButtonDown())
+        {
+            Debug.Log("Trigger pressed");
+            scan();
+        }
+
         
     }
 

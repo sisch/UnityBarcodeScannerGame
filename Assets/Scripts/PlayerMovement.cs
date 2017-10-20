@@ -3,6 +3,7 @@
 public class PlayerMovement : MonoBehaviour
 {
     public float moveSpeed;
+    public Camera playerCamera;
     private GameObject player;
 
     private void Start()
@@ -28,16 +29,15 @@ public class PlayerMovement : MonoBehaviour
 
     private void mouseLook()
     {
-        Camera cam = Camera.main;
         // Speichere die aktuelle Camera Rotation und die Mausbewegung in X und Y Richtung seit dem letzten Frame in je eine Variable
-        Quaternion camRotation = cam.transform.localRotation;
+        Quaternion camRotation = playerCamera.transform.localRotation;
         float x = Input.GetAxis("Mouse X");
         float y = Input.GetAxis("Mouse Y");
 
         // Die neue Kamerarotation ist ein kombiniertes Quaternion aus der Drehung um die Y-Achse (Wanken),
         // der eigentlichen Kameradrehung
         // und der Drehung um die X-Achse (Neigen)
-        cam.transform.localRotation =
+        playerCamera.transform.localRotation =
             Quaternion.Euler(0, x, 0) *
             camRotation *
             Quaternion.Euler(-y, 0, 0);
@@ -57,7 +57,7 @@ public class PlayerMovement : MonoBehaviour
         newPosition *= moveSpeed * Time.deltaTime;
         // ACHTUNG, HIER HATTE ICH ETWAS VERGESSEN
         // Damit die Steuerung nicht auf den Weltachsen basiert, sondern auf dem Player, muss die CameraRotation eingerechnet werden.
-        newPosition = Camera.main.transform.localRotation * newPosition;
+        newPosition = playerCamera.transform.localRotation * newPosition;
 
         // Die neue relative Bewegung wird dann der aktuellen Position hinzugefügt.
         transform.position = transform.position + newPosition;
